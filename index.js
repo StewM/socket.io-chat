@@ -5,6 +5,8 @@ var io = require('socket.io')(http);
 
 app.use(express.static(__dirname + '/public'));
 
+var port = process.env.PORT || 5000;
+
 var usernames = {};
 var numUsers = 0;
 
@@ -40,6 +42,6 @@ io.on('connection', function(socket){
 	});
 });
 
-http.listen(5000, function(){
-	console.log('listening on *:5000');
+http.listen(port, function(){
+	console.log('listening on *:' + port);
 });
