@@ -1,14 +1,42 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-app.get('/', function(req, res){
-	res.sendFile(__dirname + '/index.html');
-});
+app.use(express.static(__dirname + '/public'));
+
+var usernames = {};
+var numUsers = 0;
 
 io.on('connection', function(socket){
+	var addedUser = false;
+
 	socket.on('chat message', function(msg){
-		io.emit('chat message', msg);
+		socket.broadcast.emit('chat message', {
+			username: socket.username,
+			message: msg
+		});
+	});
+
+	socket.on('add user', function(username){
+		socket.username = username;
+
+		usernames[username] = username;
+		++numUsers;
+
+		addedUser = true;
+		socket.emit('login');
+
+		socket.broadcast.emit('user joined', socket.username);
+	});
+
+	socket.on('disconnect', function(){
+		if (addedUser){
+			delete usernames[socket.username];
+			--numUsers;
+
+			socket.broadcast.emit('user left', socket.username);
+		}
 	});
 });
 
