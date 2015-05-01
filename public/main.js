@@ -8,7 +8,11 @@ var $messages = $('.messages'); // Messages area
 var $inputMessage = $('.inputMessage'); // Input message input box
 
 var $loginPage = $('.login.page'); // The login page
-var $chatPage = $('.chat.page'); // The chatroom page
+var $chatPage = $('.chat.page'); // The chatroom 
+
+$('<audio id="chatAudio"><source src="notification.wav" type="audio/wav"></audio>').appendTo('body');
+$('<audio id="loginAudio"><source src="login.wav" type="audio/wav"></audio>').appendTo('body');
+$('<audio id="logoutAudio"><source src="logout.wav" type="audio/wav"></audio>').appendTo('body');
 
 // Prompt for setting a username
 var username;
@@ -92,11 +96,13 @@ socket.on('login', function() {
 
 socket.on('user joined', function(name){
   $('.messages').append($('<li class="message" />').text(name + ' joined the chat'));
+  $('#loginAudio')[0].play();
    $messages[0].scrollTop = $messages[0].scrollHeight;
 });
 
 socket.on('user left', function(name){
   $('.messages').append($('<li class="message" />').text(name + ' left the chat'));
+  $('#logoutAudio')[0].play();
    $messages[0].scrollTop = $messages[0].scrollHeight;
 });
   
@@ -109,6 +115,9 @@ socket.on('chat message', function(data){
     .data('username', data.username)
     .append($usernameDiv, $messageBodyDiv);
   $('.messages').append($messageDiv);
+  if (!document.hasFocus()){
+    $('#chatAudio')[0].play();
+  };
    $messages[0].scrollTop = $messages[0].scrollHeight;
 });
 
